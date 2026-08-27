@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>二甲用品待辦清單</title>
+  <style>
+    :root{
+      --bg1:#fff8f2;
+      --bg2:#fffdf9;
+      --card:#ffffff;
+      --text:#5a4a42;
+      --muted:#8d7b72;
+      --primary:#e99f8f;
+      --accent:#f5e2a9;
+      --line:#f1ddd4;
+      --shadow:0 10px 28px rgba(150,110,90,.10);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+      background:
+        radial-gradient(circle at top right, #ffe8de 0, transparent 32%),
+        radial-gradient(circle at top left, #fff0c9 0, transparent 28%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      color:var(--text);
+      line-height:1.6;
+    }
+    .wrap{max-width:860px;margin:0 auto;padding:22px 16px 40px}
+    .hero{
+      background:rgba(255,255,255,.75);
+      backdrop-filter: blur(8px);
+      border:1px solid rgba(255,255,255,.8);
+      box-shadow:var(--shadow);
+      border-radius:28px;
+      padding:24px 20px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      width:140px;height:140px;
+      right:-28px; top:-28px;
+      background: radial-gradient(circle, #ffd8cc 0, #ffd8cc 35%, transparent 70%);
+      opacity:.7;
+      pointer-events:none;
+    }
+    h1{margin:0 0 6px;font-size:clamp(1.7rem,4vw,2.4rem);line-height:1.25;color:#7a594e}
+    .subtitle{margin:0 0 12px;color:var(--muted);font-size:.98rem}
+    .badges{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+    .badge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:7px 12px;background:#fff7f3;border:1px solid #f4dbcf;
+      color:#8a6d62;border-radius:999px;font-size:.9rem;
+    }
+    .notice{
+      margin-top:16px;background:#fffaf1;border:1px dashed #edc888;
+      color:#7c6840;padding:12px 14px;border-radius:16px;font-size:.95rem;
+    }
+    .grid{display:grid;gap:18px;margin-top:20px}
+    .card{
+      background:var(--card);border:1px solid #f4e5de;border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:18px 16px 16px;
+    }
+    .card h2{margin:0 0 6px;font-size:1.25rem;color:#7b5a4f}
+    .meta{color:var(--muted);font-size:.95rem;margin-bottom:10px}
+    .progress-box{
+      background:#fff8f6;border:1px solid #f4ddd3;border-radius:16px;
+      padding:12px;margin-bottom:14px;
+    }
+    .progress-top{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:8px;margin-bottom:8px;font-size:.94rem;color:#896c61;
+    }
+    .bar{width:100%;height:10px;background:#f7e5df;border-radius:999px;overflow:hidden}
+    .bar > span{
+      display:block;height:100%;width:0%;
+      background:linear-gradient(90deg, var(--primary), #efb29b);
+      border-radius:999px;transition: width .25s ease;
+    }
+    .info-list{margin:0 0 12px;padding-left:1.2rem;color:#6f6059}
+    .checklist{display:grid;gap:10px}
+    .item{
+      display:flex;align-items:flex-start;gap:12px;background:#fffdfa;
+      border:1px solid #f4e7df;padding:12px;border-radius:16px;
+    }
+    .item:hover{background:#fffaf7}
+    input[type=checkbox]{
+      appearance:none;-webkit-appearance:none;width:22px;height:22px;border-radius:8px;
+      border:2px solid #dcb6a8;background:#fff;margin-top:2px;flex:0 0 auto;
+      position:relative;cursor:pointer;
+    }
+    input[type=checkbox]:checked{background:var(--primary);border-color:var(--primary)}
+    input[type=checkbox]:checked::after{
+      content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
+      border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+    }
+    label{cursor:pointer;display:block;width:100%}
+    .title{display:block;font-weight:700;color:#664f47;margin-bottom:2px}
+    .desc{display:block;font-size:.92rem;color:#8a7a72}
+    .checked label .title,.checked label .desc{text-decoration:line-through;color:#af9d95}
+    .tips{
+      margin-top:10px;background:#f9f6ff;border:1px solid #ebdef9;border-radius:16px;
+      padding:12px 14px;color:#6f6179;font-size:.94rem;
+    }
+    .tips ul{margin:8px 0 0;padding-left:1.2rem}
+    .section-note{margin-top:12px;font-size:.92rem;color:#8c7c74}
+    .footer-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+    button{
+      border:none;border-radius:999px;padding:12px 16px;font-size:.95rem;cursor:pointer;
+      transition:transform .15s ease, opacity .15s ease;
+    }
+    button:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 6px 18px rgba(233,159,143,.25)}
+    .btn-soft{background:#fff6f2;color:#7f6358;border:1px solid #f2ddd4}
+    .small{font-size:.88rem;color:#998981;margin-top:12px}
+    .footer{text-align:center;color:#998981;font-size:.88rem;margin-top:18px}
+    @media (min-width:860px){
+      .grid{grid-template-columns:1fr 1fr;align-items:start}
+      .hero{padding:28px 28px}
+      .card{padding:20px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>二甲用品待辦清單</h1>
+      <p class="subtitle">歡迎使用手機勾選的家長提醒清單。完成一項就勾一項，方便自己查看，不必再準備紙本通知單。</p>
+      <div class="badges">
+        <span class="badge">🌷 溫馨提醒</span>
+        <span class="badge">📱 適合手機查看</span>
+        <span class="badge">✅ 可自行勾選</span>
+        <span class="badge">💾 會保留在此裝置</span>
+      </div>
+      <div class="notice">
+        <strong>提醒：</strong>此頁面的勾選紀錄會保存在 <strong>家長目前使用的手機／瀏覽器</strong> 中，方便自行確認；<strong>不會回傳給老師</strong>。
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card" data-section="return">
+        <h2>8/28（五）返校日</h2>
+        <div class="meta">返校日流程與當日攜帶物品</div>
+        <div class="progress-box">
+          <div class="progress-top">
+            <span>返校日準備進度</span>
+            <strong class="progress-text">0 / 0</strong>
+          </div>
+          <div class="bar"><span></span></div>
+        </div>
+        <ul class="info-list">
+          <li>7:40 到校</li>
+          <li>7:40–8:40 環境打掃</li>
+          <li>8:50 聽廣播、發放教科書</li>
+          <li>10:30 統一放學</li>
+        </ul>
+        <div class="checklist">
+          <div class="item">
+            <input id="return-1" type="checkbox">
+            <label for="return-1">
+              <span class="title">書包／可裝教科書的袋子</span>
+              <span class="desc">返校日會發放教科書，請準備可裝書本的書包或提袋。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="return-2" type="checkbox">
+            <label for="return-2">
+              <span class="title">姓名貼或油性簽字筆</span>
+              <span class="desc">可在領到課本後，立即貼上或寫上姓名。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="return-3" type="checkbox">
+            <label for="return-3">
+              <span class="title">簡單鉛筆盒</span>
+              <span class="desc">建議準備鉛筆、橡皮擦即可，方便臨時填寫資料。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="return-4" type="checkbox">
+            <label for="return-4">
+              <span class="title">水壺</span>
+              <span class="desc">返校日上午在校，請記得帶水壺。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="return-5" type="checkbox">
+            <label for="return-5">
+              <span class="title">抹布 1 條</span>
+              <span class="desc">返校日有環境打掃，請孩子攜帶抹布。</span>
+            </label>
+          </div>
+        </div>
+        <p class="section-note">明日僅為返校日，正式開學用品不需一次帶齊。</p>
+      </section>
+
+      <section class="card" data-section="school">
+        <h2>8/31 正式開學用品</h2>
+        <div class="meta">請依下列清單準備開學用品</div>
+        <div class="progress-box">
+          <div class="progress-top">
+            <span>開學用品準備進度</span>
+            <strong class="progress-text">0 / 0</strong>
+          </div>
+          <div class="bar"><span></span></div>
+        </div>
+        <div class="checklist">
+          <div class="item">
+            <input id="school-1" type="checkbox">
+            <label for="school-1">
+              <span class="title">簡單實用的鉛筆盒／筆袋</span>
+              <span class="desc">以簡單、實用為主，避免玩具型或功能過多的款式。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="school-2" type="checkbox">
+            <label for="school-2">
+              <span class="title">B 或 2B 鉛筆 3～5 支</span>
+              <span class="desc">請每天在家先削好，再帶到學校。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="school-3" type="checkbox">
+            <label for="school-3">
+              <span class="title">橡皮擦 1～2 個</span>
+              <span class="desc">請準備好擦拭、簡單款式即可。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="school-4" type="checkbox">
+            <label for="school-4">
+              <span class="title">15 公分直尺 1 把</span>
+              <span class="desc">建議刻度清楚，不建議摺疊尺。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="school-5" type="checkbox">
+            <label for="school-5">
+              <span class="title">紅筆 1 支</span>
+              <span class="desc">方便日後訂正使用。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="school-6" type="checkbox">
+            <label for="school-6">
+              <span class="title">水壺</span>
+              <span class="desc">請準備可每日攜帶的水壺。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="school-7" type="checkbox">
+            <label for="school-7">
+              <span class="title">抽取式衛生紙 1 包</span>
+              <span class="desc">可放置教室備用。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="school-8" type="checkbox">
+            <label for="school-8">
+              <span class="title">餐具＋餐袋</span>
+              <span class="desc">請依學校午餐使用需求準備。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="school-9" type="checkbox">
+            <label for="school-9">
+              <span class="title">潔牙用品</span>
+              <span class="desc">牙刷、牙膏、漱口杯。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="school-10" type="checkbox">
+            <label for="school-10">
+              <span class="title">抹布 1 條</span>
+              <span class="desc">供班級清潔使用。</span>
+            </label>
+          </div>
+          <div class="item">
+            <input id="school-11" type="checkbox">
+            <label for="school-11">
+              <span class="title">所有個人物品均標示姓名</span>
+              <span class="desc">包含文具、水壺、餐具、牙刷杯等，請務必寫上姓名。</span>
+            </label>
+          </div>
+        </div>
+        <div class="tips">
+          <strong>小提醒</strong>
+          <ul>
+            <li>本班請使用一般 <strong>B／2B 鉛筆</strong>，暫不使用自動鉛筆。</li>
+            <li>鉛筆請每天在家削好再帶到學校。</li>
+            <li>文具以簡單、實用為主，避免攜帶容易分心的玩具型文具。</li>
+            <li>其他美勞用品若課程需要，老師會再另行通知，不需一次買齊。</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>小功能</h2>
+      <div class="footer-actions">
+        <button class="btn-primary" id="scrollTopBtn">回到最上方</button>
+        <button class="btn-soft" id="resetChecks">清除所有勾選</button>
+      </div>
+      <p class="small">若您更換手機、瀏覽器，或清除瀏覽資料，勾選紀錄可能會消失，需要重新勾選。</p>
+      <div class="footer">祝孩子開學順利，也謝謝家長的配合與協助 🌷</div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "grade2-parent-checklist-v1";
+    function loadState() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch (e) { return {}; }
+    }
+    function saveState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function updateItemStyle(checkbox) {
+      const item = checkbox.closest(".item");
+      item.classList.toggle("checked", checkbox.checked);
+    }
+    function updateProgress(sectionEl) {
+      const checks = [...sectionEl.querySelectorAll('input[type="checkbox"]')];
+      const done = checks.filter(c => c.checked).length;
+      const total = checks.length;
+      sectionEl.querySelector(".progress-text").textContent = `${done} / ${total}`;
+      sectionEl.querySelector(".bar > span").style.width = `${total ? (done / total) * 100 : 0}%`;
+    }
+    function init() {
+      const state = loadState();
+      const checks = document.querySelectorAll('input[type="checkbox"]');
+      checks.forEach(cb => {
+        if (state[cb.id]) cb.checked = true;
+        updateItemStyle(cb);
+        cb.addEventListener("change", () => {
+          const current = loadState();
+          current[cb.id] = cb.checked;
+          saveState(current);
+          updateItemStyle(cb);
+          const section = cb.closest("[data-section]");
+          if (section) updateProgress(section);
+        });
+      });
+      document.querySelectorAll("[data-section]").forEach(updateProgress);
+      document.getElementById("resetChecks").addEventListener("click", () => {
+        if (!confirm("要清除目前所有勾選紀錄嗎？")) return;
+        localStorage.removeItem(STORAGE_KEY);
+        checks.forEach(cb => {
+          cb.checked = false;
+          updateItemStyle(cb);
+        });
+        document.querySelectorAll("[data-section]").forEach(updateProgress);
+      });
+      document.getElementById("scrollTopBtn").addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+    init();
+  </script>
+</body>
+</html>
